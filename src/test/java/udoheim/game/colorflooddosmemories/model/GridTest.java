@@ -1,6 +1,6 @@
 package udoheim.game.colorflooddosmemories.model;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import udoheim.game.colorflooddosmemories.enumeration.ColorName;
 
@@ -8,10 +8,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class GridTest {
   
-  Grid grid;
+  static Grid grid;
   
-  @BeforeEach
-  void setup() {
+  @BeforeAll
+  static void beforeAll() {
     Cell[][] cells = new Cell[4][4];
     createCell(cells, 0,0,ColorName.BLUE);
     createCell(cells, 0,1,ColorName.YELLOW);
@@ -29,19 +29,34 @@ class GridTest {
     createCell(cells, 3,1,ColorName.BLUE);
     createCell(cells, 3,2,ColorName.YELLOW);
     createCell(cells, 3,3,ColorName.BLUE);
-    this.grid = new Grid(cells);
+    grid = new Grid(cells);
   }
   
   @Test
   void playerTurn() {
-    assert(grid.getPlayerCells().size() == 1);
-    grid.playerTurn(ColorName.BLUE);
-    assert (grid.getPlayerCells().size() == 2);
+    ColorName colorName = ColorName.BLUE;
+    assertEquals(1,grid.getPlayerCells().size());
+    grid.playerTurn(colorName);
+    assertEquals(2,grid.getPlayerCells().size());
+    for (Cell cell : grid.getPlayerCells()) {
+      assertEquals(colorName, cell.getColorName());
+    }
+  }
+  
+  @Test
+  void computerTurn() {
+    assertEquals(1,grid.getComputerCells().size());
+    grid.computerTurn();
+    assertEquals(4,grid.getComputerCells().size());
+    ColorName colorName = ColorName.GREEN;
+    for (Cell cell : grid.getComputerCells()) {
+      assertEquals(colorName, cell.getColorName());
+    }
   }
   
   
   
-  void createCell(Cell[][] cells, int i, int j, ColorName colorName) {
+  static void createCell(Cell[][] cells, int i, int j, ColorName colorName) {
     cells[i][j] = new Cell(new Coordinates(i, j), colorName);
   }
 }

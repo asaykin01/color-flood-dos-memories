@@ -116,7 +116,65 @@ public class Grid {
     
   }
   
+  public synchronized void computerTurn () {
+    // survey neighboring cells to computer cells
+    CellsByColor tracker = this.surveyNeighbors(this.computerCells);
+    // get most frequent color
+    ColorName colorName = tracker.getMostFrequentColor();
+    // get the set of cells for that color
+    HashSet<Cell> cellsToAnnex = tracker.getSetByColor(colorName);
+    // change computer cells to new color
+    for (Cell cell : this.computerCells) {
+      cell.setColorName(colorName);
+    }
+    // add cells to annex to computer
+    for (Cell cell : cellsToAnnex) {
+      this.addCellToUser(this.computer, this.computerCells, cell);
+    }
+  }
   
+  protected synchronized CellsByColor surveyNeighbors(HashSet<Cell> userCells) {
+    
+    CellsByColor tracker = new CellsByColor();
+    
+    // iterate over user owned cells via shallow clone hashmap to avoid
+    // concurrent modification exceptions.
+    HashSet<Cell> userCellsClone = new HashSet<>((Collection) userCells.clone());
+    for (Cell cell : userCellsClone) {
+      
+      // get the cells neighbors and iterate over them
+      HashSet<Cell> userCellNeighbors = cell.getNeighbors(this.grid);
+      for (Cell neighborCell : userCellNeighbors) {
+        // only proceed if this is not a cell owned by any user
+        if (neighborCell.getUser() == null) {
+          // add cell to color tracking for whatever color this is
+          tracker.addCell(neighborCell);
+          // call method to see if any neighbors of this cell are of the same
+          // color
+          this.surveyNeighbors(neighborCell, tracker);
+        }
+      }
+    }
+    return tracker;
+  }
+  
+  private void surveyNeighbors(Cell cell, CellsByColor tracker) {
+    HashSet<Cell> userCellNeighbors = cell.getNeighbors(this.grid);
+    for (Cell neighborCell : userCellNeighbors) {
+      // only proceed if this is not a cell owned by any user,
+      // the cell is not already in tracker,
+      // and the cell is of the same color as the calling cell
+      if (neighborCell.getUser() == null
+          && !tracker.getSetByColor(cell.getColorName()).contains(neighborCell)
+          && neighborCell.getColorName().equals(cell.getColorName())) {
+        // add cell to color tracking for whatever color this is
+        tracker.addCell(neighborCell);
+        // call this method recursively to see if more cels of same color can
+        // be found
+        surveyNeighbors(neighborCell, tracker);
+      }
+    }
+  }
   
   /**
    * Does necessary work to connect a cell to a user
