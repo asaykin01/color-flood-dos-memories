@@ -16,7 +16,6 @@ public class Cell {
   
   private User user;
   private ColorName colorName;
-  private String displayText;
   
   public Cell () {
     this(new Coordinates(0,0));
@@ -31,7 +30,6 @@ public class Cell {
     this.id = this.coordinates.getX() + "_" + this.coordinates.getY();
     this.colorName = colorName;
     this.user = null;
-    this.displayText = " ";
   }
   
   
@@ -96,10 +94,11 @@ public class Cell {
   }
   
   public String getDisplayText() {
+    String displayText = " ";
+    if (this.user != null) {
+      displayText = user.getName();
+    }
     return displayText;
   }
   
-  public void setDisplayText(String displayText) {
-    this.displayText = displayText;
-  }
 }

@@ -52,6 +52,8 @@ public class MainController {
     ColorName colorName = ColorName.getColorName(nameOfColor);
     this.theGrid.playerTurn(colorName);
     model.addAttribute("theGird", theGrid.getGrid());
+    this.theGrid.computerTurn();
+    model.addAttribute("theGird", theGrid.getGrid());
     return "main";
   }
   
