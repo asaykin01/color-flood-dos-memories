@@ -3,8 +3,7 @@ package udoheim.game.colorflooddosmemories.model;
 import udoheim.game.colorflooddosmemories.enumeration.ColorName;
 import udoheim.game.colorflooddosmemories.utilities.ColorManagement;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.*;
 
 public class Grid {
   
@@ -18,10 +17,31 @@ public class Grid {
   private int gridHeight;
   private Cell[][] grid;
   
+  /**
+   * Constructor that allows for a specific grid for testing purposes only.
+   * @param grid - the grid. assuming the grid is proper
+   */
+  protected Grid (Cell[][] grid) {
+    this.grid = grid;
+    this.gridLength = grid.length;
+    this.gridHeight = grid[0].length;
+    this.initialUserSetup();
+  }
+  
+  /**
+   * Main constructor for this class
+   * @param gridLength - length of grid
+   * @param gridHeight - width of grid
+   */
   public Grid (int gridLength, int gridHeight) {
     resetGrid(gridLength, gridHeight);
   }
   
+  /**
+   * Resets grid based on passed in length and height
+   * @param gridLength - length of new grid
+   * @param gridHeight - height of new grid
+   */
   public synchronized void resetGrid(int gridLength, int gridHeight) {
     this.gridLength = gridLength;
     this.gridHeight = gridHeight;
@@ -34,6 +54,14 @@ public class Grid {
       }
     }
     
+    this.initialUserSetup();
+    
+  }
+  
+  /**
+   * Does initial user setup
+   */
+  private void initialUserSetup() {
     this.playerCells = new HashSet<>();
     this.computerCells = new HashSet<>();
     
@@ -48,31 +76,55 @@ public class Grid {
         computerCell);
     this.checkNeighborsInit(this.computer, computerCell,
         computerCell.getColorName(), this.computerCells);
-    
   }
   
+  /**
+   * Executes player turn.
+   * @param colorName - the color the player selected
+   */
   public synchronized void playerTurn(ColorName colorName) {
     HashSet<Cell> processedCells = new HashSet<>();
-    for (Cell playerCell : this.playerCells) {
+    ArrayList<HashSet<Cell>> newPlayerCellsList =
+        new ArrayList<HashSet<Cell>>();
+    
+    // iterating over cells owned by player
+    // the shallow cloning of playerCells avoids concurrent modification errors
+    HashSet<Cell> playerCellsClone =
+        new HashSet<>((Collection<Cell>)this.playerCells.clone());
+    for (Cell playerCell : playerCellsClone) {
+      // set player cell color to new color
       playerCell.setColorName(colorName);
+      
+      // mark cell as processed
       processedCells.add(playerCell);
+      
+      // get cell neighbors
       HashSet<Cell> playerCellNeighbors = playerCell.getNeighbors(this.grid);
-      this.playerCells.addAll(this.annexSameColorNeighbors(this.player,
-          playerCellNeighbors,
-          colorName,
-          processedCells));
+      
+      // iterate over neighbors to see if anything gets added
+      HashSet<Cell> newPlayerCells =
+          this.annexSameColorNeighbors(this.player, playerCellNeighbors,
+              colorName, this.playerCells, processedCells);
+      // add added set to list
+      newPlayerCellsList.add(newPlayerCells);
     }
+    
+    // iterate over the list of sets and add all sets to player cells
+    for (HashSet<Cell> pcSet : newPlayerCellsList) {
+      this.playerCells.addAll(pcSet);
+    }
+    
   }
   
   
   
   /**
    * Does necessary work to connect a cell to a user
-   * @param user
-   * @param userCells
-   * @param cell
+   * @param user - user in question
+   * @param userCells - cells owned by user
+   * @param cell - new cell to add
    */
-  private synchronized void addCellToUser(User user, HashSet<Cell> userCells,
+  protected synchronized void addCellToUser(User user, HashSet<Cell> userCells,
                                           Cell cell) {
     cell.setUser(user);
     userCells.add(cell);
@@ -87,7 +139,7 @@ public class Grid {
    * @param colorName - the color matching to
    * @param userCells - cells owned by user
    */
-  private synchronized void checkNeighborsInit(User user, Cell userCell,
+  protected synchronized void checkNeighborsInit(User user, Cell userCell,
                                        ColorName colorName,
                                   HashSet<Cell> userCells) {
     HashSet<Cell> processedCells = new HashSet<>();
@@ -105,7 +157,7 @@ public class Grid {
    * @param colorName - color we are matching
    * @param processedCells - cells already processed
    */
-  private synchronized HashSet<Cell> checkNeighborsInit(User user,
+  protected synchronized HashSet<Cell> checkNeighborsInit(User user,
                                                HashSet<Cell> neighborCells,
                                                 ColorName colorName,
                                                 HashSet<Cell> processedCells) {
@@ -124,24 +176,45 @@ public class Grid {
     return newUserCells;
   }
   
-  private synchronized HashSet<Cell> annexSameColorNeighbors (User user,
+  protected synchronized HashSet<Cell> annexSameColorNeighbors (User user,
                                                      HashSet<Cell> neighborCells,
                                                       ColorName colorName,
+                                                      HashSet<Cell> userCells,
                                                       HashSet<Cell> processedCells) {
-    HashSet<Cell> newUserCells = new HashSet<>();
+    ArrayList<HashSet<Cell>> newUserCellsList = new ArrayList<>();
     for (Cell cell : neighborCells) {
+      // only process cell if not processed yet
       if (!processedCells.contains(cell)) {
+        // add to processed
         processedCells.add(cell);
+        
+        // if cell is not yet taken and is of the same color as passed in
         if (cell.getUser() == null && cell.getColorName().equals(colorName)) {
-          this.addCellToUser(user, newUserCells, cell);
+          // add cell to user
+          this.addCellToUser(user, userCells, cell);
+          
+          // get cells neighbors - we need to see if any more of same color
           HashSet<Cell> newNeighbors = cell.getNeighbors(this.grid);
-          newUserCells.addAll(this.annexSameColorNeighbors(user, newNeighbors,
-              colorName,
-              processedCells));
+          
+          // get cells to annex from the neighbors of this cell and add them
+          // to the set of lists.
+          HashSet<Cell> newUserCells =
+              this.annexSameColorNeighbors(user, newNeighbors, colorName,
+                  userCells, processedCells);
+          newUserCellsList.add(newUserCells);
         }
+        
       }
+      
     }
-    return neighborCells;
+    
+    // flatten the list of sets of cells and put into single hash set
+    HashSet<Cell> newUserCells = new HashSet<>();
+    for (HashSet<Cell> set : newUserCellsList) {
+      newUserCells.addAll(set);
+    }
+    
+    return newUserCells;
   }
   
   
