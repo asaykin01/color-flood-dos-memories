@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+/**
+ * Class that stores color names to be used on the grid
+ */
 public enum ColorName {
   
   RED("red"),

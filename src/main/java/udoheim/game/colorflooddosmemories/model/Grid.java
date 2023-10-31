@@ -5,6 +5,9 @@ import udoheim.game.colorflooddosmemories.utilities.ColorManagement;
 
 import java.util.*;
 
+/**
+ * Class Grid stores the grid of cells and methods for updating it for gameplay
+ */
 public class Grid {
   
   private final User player = new User("player");
@@ -133,6 +136,12 @@ public class Grid {
     }
   }
   
+  /**
+   * Main method for iterating over neighbors of user cells to see which
+   * color is most frequent among the neighbors that are not taken by any user
+   * @param userCells - cells that belong to user in question
+   * @return
+   */
   protected synchronized CellsByColor surveyNeighbors(HashSet<Cell> userCells) {
     
     CellsByColor tracker = new CellsByColor();
@@ -158,6 +167,12 @@ public class Grid {
     return tracker;
   }
   
+  /**
+   * Surveys neighbors of passed in cell to see if any of the neighbor cells
+   * that are not taken and are of the same color as the passed in cell
+   * @param cell - cell in question
+   * @param tracker - structure for recording how many cells by color
+   */
   private void surveyNeighbors(Cell cell, CellsByColor tracker) {
     HashSet<Cell> userCellNeighbors = cell.getNeighbors(this.grid);
     for (Cell neighborCell : userCellNeighbors) {
@@ -234,6 +249,17 @@ public class Grid {
     return newUserCells;
   }
   
+  /**
+   * When a color is chosen, iterates over neighbors recursively to annex
+   * these cells into the user's cells
+   * @param user - user doing the annexing
+   * @param neighborCells - cells over which to iterate
+   * @param colorName - color of cells looking for
+   * @param userCells - user's cells
+   * @param processedCells - cells already processed, so we don't repeatedly
+   *                       examine them
+   * @return Cells that were annexed as result of this method
+   */
   protected synchronized HashSet<Cell> annexSameColorNeighbors (User user,
                                                      HashSet<Cell> neighborCells,
                                                       ColorName colorName,

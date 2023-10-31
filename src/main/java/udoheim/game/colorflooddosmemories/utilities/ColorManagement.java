@@ -9,8 +9,11 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class ColorManagement {
   
+  /**
+   * Gets random color out of those defined in ColorName
+   * @return chosen ColorName object
+   */
   public static ColorName getRandomColor() {
-    
     
     int randomIndex = ThreadLocalRandom.current().nextInt(0,
         ColorName.values().length);

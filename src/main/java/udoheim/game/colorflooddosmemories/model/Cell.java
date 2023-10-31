@@ -9,6 +9,9 @@ import java.util.HashSet;
 
 import static udoheim.game.colorflooddosmemories.model.Coordinates.NEIGHBOR_COORDS;
 
+/**
+ * Class for each cell of the grid
+ */
 public class Cell {
   
   private final String id;

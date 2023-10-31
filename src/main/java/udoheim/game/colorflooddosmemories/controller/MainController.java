@@ -10,10 +10,11 @@ import udoheim.game.colorflooddosmemories.model.Cell;
 import udoheim.game.colorflooddosmemories.model.User;
 import udoheim.game.colorflooddosmemories.model.Grid;
 
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 
+/**
+ * Main controller of application
+ */
 @Controller
 @SessionAttributes({ "theGrid", "theGridLength", "theGridHeight",
     "colorNames"})

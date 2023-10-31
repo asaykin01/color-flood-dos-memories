@@ -5,6 +5,9 @@ import udoheim.game.colorflooddosmemories.enumeration.ColorName;
 import java.util.HashMap;
 import java.util.HashSet;
 
+/**
+ * Cell for tracking cells by color
+ */
 public class CellsByColor {
   
   private HashMap<ColorName, HashSet<Cell>> map;
@@ -13,6 +16,10 @@ public class CellsByColor {
     map = new HashMap<>();
   }
   
+  /**
+   * Adds cell to the map if the cell is not null
+   * @param cell - the cell that is added
+   */
   public void addCell (Cell cell) {
     if (cell != null) {
       if (this.map.containsKey(cell.getColorName())) {
@@ -25,6 +32,10 @@ public class CellsByColor {
     }
   }
   
+  /**
+   * Gets the color that has the most cells in its set
+   * @return ColorName of most frequent color, or null if nothing found
+   */
   public ColorName getMostFrequentColor() {
     int colorSize = 0;
     ColorName mostFrequent = null;
@@ -42,6 +53,11 @@ public class CellsByColor {
     return mostFrequent;
   }
   
+  /**
+   * gets the set from map for the passed in color if color is not null
+   * @param colorName - ColorName object for which to return set
+   * @return HashSet of ColorName objects for the passed in color
+   */
   public HashSet<Cell> getSetByColor(ColorName colorName) {
     HashSet<Cell> set = new HashSet<>();
     if (colorName != null && this.map.containsKey(colorName)) {

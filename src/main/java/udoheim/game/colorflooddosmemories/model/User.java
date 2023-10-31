@@ -1,5 +1,8 @@
 package udoheim.game.colorflooddosmemories.model;
 
+/**
+ * Class to keep track of who owns what cells
+ */
 public class User {
   public String getName() {
     return name;
