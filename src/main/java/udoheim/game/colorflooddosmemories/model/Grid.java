@@ -1,7 +1,6 @@
 package udoheim.game.colorflooddosmemories.model;
 
 import udoheim.game.colorflooddosmemories.enumeration.ColorName;
-import udoheim.game.colorflooddosmemories.utilities.ColorManagement;
 
 import java.util.*;
 
@@ -10,8 +9,8 @@ import java.util.*;
  */
 public class Grid {
   
-  private final User player = new User("player");
-  private final User computer = new User("computer");
+  private final User player = new User("Player");
+  private final User computer = new User("Computer");
   
   private HashSet<Cell> playerCells;
   private HashSet<Cell> computerCells;
@@ -53,7 +52,7 @@ public class Grid {
     for (int i = 0; i < this.grid.length; i++) {
       for (int j = 0; j < this.grid[i].length; j++) {
         this.grid[i][j] = new Cell(new Coordinates(i,j),
-            ColorManagement.getRandomColor());
+            ColorName.getRandomColor());
       }
     }
     
@@ -119,28 +118,78 @@ public class Grid {
     
   }
   
-  public synchronized void computerTurn () {
+  /**
+   * Method for computer to try to take turn. a turn is considered taken if
+   * the computer was able to annex cells.
+   * @return true if a turn was taken, false if not
+   */
+  public synchronized boolean computerTurn () {
+    boolean turnTaken = false;
     // survey neighboring cells to computer cells
     CellsByColor tracker = this.surveyNeighbors(this.computerCells);
     // get most frequent color
     ColorName colorName = tracker.getMostFrequentColor();
-    // get the set of cells for that color
-    HashSet<Cell> cellsToAnnex = tracker.getSetByColor(colorName);
-    // change computer cells to new color
-    for (Cell cell : this.computerCells) {
-      cell.setColorName(colorName);
+    
+    // if a color is found, proceed
+    if (colorName != null) {
+      // get the set of cells for that color
+      HashSet<Cell> cellsToAnnex = tracker.getSetByColor(colorName);
+      // change computer cells to new color
+      for (Cell cell : this.computerCells) {
+        cell.setColorName(colorName);
+      }
+      // add cells to annex to computer
+      for (Cell cell : cellsToAnnex) {
+        this.addCellToUser(this.computer, this.computerCells, cell);
+      }
+      turnTaken = true;
     }
-    // add cells to annex to computer
-    for (Cell cell : cellsToAnnex) {
-      this.addCellToUser(this.computer, this.computerCells, cell);
+    return turnTaken;
+  }
+  
+  /**
+   * Determines whether the game is over. The game is considered over if
+   * there are no cells left not owned by either user, or the difference in
+   * owned cells between users is more than not owned cells remaining.
+   * @return true if game is over. false if game is not over.
+   */
+  public boolean isGameOver () {
+    boolean isGameOver = false;
+    int totalCells = this.gridLength * this.gridHeight;
+    
+    int notOwnedCells =
+        totalCells - this.playerCells.size() + this.computerCells.size();
+    int userCellDifference =
+        Math.abs(this.playerCells.size() - this.computerCells.size());
+    
+    if (notOwnedCells <= 0 && userCellDifference > notOwnedCells) {
+      isGameOver = true;
     }
+    
+    return isGameOver;
+  }
+  
+  /**
+   * Figures out which user is the current by seeing who owns more cells.
+   * if the number of cells is the same between the users, then it's a tie.
+   * @return user object or winner, or null if it is a tie.
+   */
+  public User getCurrentWinner () {
+    User winner = null;
+    if (this.playerCells.size() > this.computerCells.size()) {
+      winner = this.player;
+    } else if (this.computerCells.size() > this.playerCells.size()) {
+      winner = this.computer;
+    }
+    return winner;
   }
   
   /**
    * Main method for iterating over neighbors of user cells to see which
    * color is most frequent among the neighbors that are not taken by any user
    * @param userCells - cells that belong to user in question
-   * @return
+   * @return CellsByColor object containing information on neighbors by color
+   * that can be annexed
    */
   protected synchronized CellsByColor surveyNeighbors(HashSet<Cell> userCells) {
     
@@ -173,7 +222,7 @@ public class Grid {
    * @param cell - cell in question
    * @param tracker - structure for recording how many cells by color
    */
-  private void surveyNeighbors(Cell cell, CellsByColor tracker) {
+  private synchronized void surveyNeighbors(Cell cell, CellsByColor tracker) {
     HashSet<Cell> userCellNeighbors = cell.getNeighbors(this.grid);
     for (Cell neighborCell : userCellNeighbors) {
       // only proceed if this is not a cell owned by any user,

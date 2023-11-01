@@ -1,10 +1,7 @@
 package udoheim.game.colorflooddosmemories.model;
 
 import udoheim.game.colorflooddosmemories.enumeration.ColorName;
-import udoheim.game.colorflooddosmemories.utilities.ColorManagement;
 
-import java.awt.Color;
-import java.util.ArrayList;
 import java.util.HashSet;
 
 import static udoheim.game.colorflooddosmemories.model.Coordinates.NEIGHBOR_COORDS;
@@ -25,7 +22,7 @@ public class Cell {
   }
   
   public Cell(Coordinates coordinates) {
-    this(coordinates, ColorManagement.getRandomColor());
+    this(coordinates, ColorName.getRandomColor());
   }
   
   public Cell(Coordinates coordinates, ColorName colorName) {
@@ -99,7 +96,9 @@ public class Cell {
   public String getDisplayText() {
     String displayText = " ";
     if (this.user != null) {
-      displayText = user.getName();
+      displayText = user.getInitial();
+    } else {
+      displayText = "_";
     }
     return displayText;
   }

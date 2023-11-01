@@ -13,32 +13,39 @@
     <h1>Color Flood Nostalgia Mid-90s</h1>
 
     <table id="theGridTable" class=table>
-      <tr th:each="row: ${theGird}">
-        <span th:each="cell: ${row}">
-          <td th:id="${cell.id}"
-              th:style="'width:50px; height:50px;'"
-              th:styleappend="${cell.colorName}"
-              th:text="${cell.displayText}">
-          </td>
-        </span>
-      </tr>
+      <tbody>
+        <tr th:each="row: ${theGird}">
+          <span th:each="cell: ${row}">
+            <td th:id="${cell.id}"
+                th:style="${cell.colorName}"
+                th:text="${cell.displayText}">
+            </td>
+          </span>
+        </tr>
+      </tbody>
     </table>
     <br/>
     <table id="colorChoiceTable" class=table>
-      <tr>
-        <span th:each="colorName: ${colorNames}">
-          <td th:id="${colorName.NAME}"
-            th:styleappend="${colorName}"/>
-            <a
-                th:style="'background-color: white'"
-                th:href="@{/submitPlayerColor(nameOfColor=${colorName.NAME})}"
-                th:text="${colorName.NAME}"
-            >
-              <label /></a>
-          </td>
-        </span>
-      </tr>
+      <tbody>
+        <tr>
+          <span th:each="colorName: ${colorNames}">
+            <td th:id="${colorName.NAME}"
+              th:styleappend="${colorName.COLOR_STYLE + '; ' + colorRowWidthText}"/>
+              <h3><a
+                  th:style="'background-color: white'"
+                  th:href="@{/submitPlayerColor(nameOfColor=${colorName.NAME})}"
+                  th:text="${colorName.NAME}"
+              >
+                <label /></a></h3>
+            </td>
+          </span>
+        </tr>
+      </tbody>
     </table>
+
+
+
+    <p><a href="/resetGame">Reset Game</a></p>
 
   </body>
 </html>

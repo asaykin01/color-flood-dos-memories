@@ -10,6 +10,7 @@ import udoheim.game.colorflooddosmemories.model.Cell;
 import udoheim.game.colorflooddosmemories.model.User;
 import udoheim.game.colorflooddosmemories.model.Grid;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
@@ -20,27 +21,21 @@ import java.util.HashSet;
     "colorNames"})
 public class MainController {
   
-  private HashSet<ColorName> colorNames;
+  private ArrayList<ColorName> colorNames;
   private Grid theGrid;
-  private int theGridLength = 10;
-  private int theGridHeight = 10;
-  private int colorRowPercent;
+  private int theGridLength = 30;
+  private int theGridHeight = 20;
+  private String colorRowWidthText;
   
   @GetMapping({"/"})
-  public String main(@RequestParam(required = false, defaultValue = "World")
-                             String name, Model model) {
-    model.addAttribute("name", name);
-    if (theGrid == null) {
-      theGrid = new Grid(this.theGridLength,
-          this.theGridLength);
-    }
+  public String main(Model model) {
+    theGrid = new Grid(this.theGridLength, this.theGridLength);
     model.addAttribute("theGird", theGrid.getGrid());
-    if (colorNames == null) {
-      colorNames = ColorName.getColorNames();
-    }
+    colorNames = ColorName.getColorNames();
     model.addAttribute("colorNames", colorNames);
-    
-    colorRowPercent = 100 / colorNames.size();
+    int colorRowPercent = 100 / colorNames.size();
+    this.colorRowWidthText = "width : " + colorRowPercent + "%";
+    model.addAttribute("colorRowWidthText", colorRowWidthText);
     
     return "main";
   }
@@ -50,12 +45,32 @@ public class MainController {
                                    @RequestParam(name = "nameOfColor")
                                    String nameOfColor) {
     System.out.println("color " + nameOfColor);
+    // if we load this for any reason and there is no grid, reset the game
+    if (this.theGrid == null) {
+      return this.main(model);
+    }
     ColorName colorName = ColorName.getColorName(nameOfColor);
     this.theGrid.playerTurn(colorName);
     model.addAttribute("theGird", theGrid.getGrid());
     this.theGrid.computerTurn();
+    
+    if (this.theGrid.isGameOver()) {
+      User winner = this.theGrid.getCurrentWinner();
+    }
+    
     model.addAttribute("theGird", theGrid.getGrid());
+    model.addAttribute("colorNames", colorNames);
+    model.addAttribute("colorRowWidthText", colorRowWidthText);
     return "main";
+  }
+  
+  @GetMapping("/resetGame")
+  public String resetGame(Model model) {
+    return this.main(model);
+  }
+  
+  public String getColorRowWidthText() {
+    return colorRowWidthText;
   }
   
   public Cell[][] getTheGrid() {
@@ -78,16 +93,8 @@ public class MainController {
     this.theGridHeight = theGridHeight;
   }
   
-  public HashSet<ColorName> getColorNames() {
+  public ArrayList<ColorName> getColorNames() {
     return colorNames;
-  }
-  
-  public int getColorRowPercent() {
-    return colorRowPercent;
-  }
-  
-  public void setColorRowPercent(int colorRowPercent) {
-    this.colorRowPercent = colorRowPercent;
   }
   
   public User getPlayer() {

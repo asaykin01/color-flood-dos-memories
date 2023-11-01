@@ -1,8 +1,10 @@
 package udoheim.game.colorflooddosmemories.enumeration;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Class that stores color names to be used on the grid
@@ -17,7 +19,7 @@ public enum ColorName {
   BLUE("blue"),
   PURPLE("purple");
   
-  private static HashSet<ColorName> colorNames;
+  private static ArrayList<ColorName> colorNames;
   private static Map<String, ColorName> colorNameMap;
   
   private final String NAME;
@@ -34,7 +36,7 @@ public enum ColorName {
   
   private static void addToColorNames(ColorName colorName) {
     if (colorNames == null) {
-      colorNames = new HashSet<>();
+      colorNames = new ArrayList<>();
     }
     colorNames.add(colorName);
   }
@@ -57,6 +59,18 @@ public enum ColorName {
     return colorName;
   }
   
+  /**
+   * Gets random color out of those defined in ColorName
+   * @return chosen ColorName object
+   */
+  public static ColorName getRandomColor() {
+    
+    int randomIndex = ThreadLocalRandom.current().nextInt(0,
+        values().length);
+    ColorName randomColor = values()[randomIndex];
+    return randomColor;
+  }
+  
   
   @Override
   public String toString() {
@@ -71,7 +85,7 @@ public enum ColorName {
     return COLOR_STYLE;
   }
   
-  public static HashSet<ColorName> getColorNames() {
+  public static ArrayList<ColorName> getColorNames() {
     return colorNames;
   }
 }
