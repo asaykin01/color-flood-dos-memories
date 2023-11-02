@@ -5,6 +5,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import udoheim.game.colorflooddosmemories.enumeration.ColorName;
 import udoheim.game.colorflooddosmemories.model.Cell;
 import udoheim.game.colorflooddosmemories.model.User;
@@ -18,14 +19,16 @@ import java.util.HashSet;
  */
 @Controller
 @SessionAttributes({ "theGrid", "theGridLength", "theGridHeight",
-    "colorNames"})
+    "colorNames", "isGameOver"})
 public class MainController {
   
   private ArrayList<ColorName> colorNames;
   private Grid theGrid;
-  private int theGridLength = 30;
-  private int theGridHeight = 20;
+  private int theGridLength = 19;
+  private int theGridHeight = 15;
   private String colorRowWidthText;
+  private boolean isGameOver;
+  private String resultText;
   
   @GetMapping({"/"})
   public String main(Model model) {
@@ -36,6 +39,10 @@ public class MainController {
     int colorRowPercent = 100 / colorNames.size();
     this.colorRowWidthText = "width : " + colorRowPercent + "%";
     model.addAttribute("colorRowWidthText", colorRowWidthText);
+    this.isGameOver = false;
+    model.addAttribute("isGameOver", this.isGameOver);
+    this.resultText = "";
+    model.addAttribute("resultText", this.resultText);
     
     return "main";
   }
@@ -44,7 +51,6 @@ public class MainController {
   public String submitPlayerColor (Model model,
                                    @RequestParam(name = "nameOfColor")
                                    String nameOfColor) {
-    System.out.println("color " + nameOfColor);
     // if we load this for any reason and there is no grid, reset the game
     if (this.theGrid == null) {
       return this.main(model);
@@ -54,13 +60,23 @@ public class MainController {
     model.addAttribute("theGird", theGrid.getGrid());
     this.theGrid.computerTurn();
     
-    if (this.theGrid.isGameOver()) {
+    this.isGameOver = this.theGrid.isGameOver();
+    model.addAttribute("isGameOver", this.isGameOver);
+    if (this.isGameOver) {
       User winner = this.theGrid.getCurrentWinner();
+      if (winner != null) {
+        this.resultText = winner.getName() + " has won!";
+      } else {
+        this.resultText = "It's a tie!";
+      }
+      this.resultText += " Please 'Reset Game' to play again.";
+      model.addAttribute("resultText", this.resultText);
+    } else {
+      
+      model.addAttribute("theGird", this.theGrid.getGrid());
+      model.addAttribute("colorNames", this.colorNames);
+      model.addAttribute("colorRowWidthText", this.colorRowWidthText);
     }
-    
-    model.addAttribute("theGird", theGrid.getGrid());
-    model.addAttribute("colorNames", colorNames);
-    model.addAttribute("colorRowWidthText", colorRowWidthText);
     return "main";
   }
   
@@ -103,5 +119,13 @@ public class MainController {
   
   public User getComputer() {
     return theGrid.getComputer();
+  }
+  
+  public boolean isGameOver() {
+    return isGameOver;
+  }
+  
+  public String getResultText() {
+    return resultText;
   }
 }

@@ -85,6 +85,7 @@ public class Grid {
    * @param colorName - the color the player selected
    */
   public synchronized void playerTurn(ColorName colorName) {
+    System.out.println("\nPlayer turn; picked '" + colorName + "'");
     HashSet<Cell> processedCells = new HashSet<>();
     ArrayList<HashSet<Cell>> newPlayerCellsList =
         new ArrayList<HashSet<Cell>>();
@@ -129,7 +130,7 @@ public class Grid {
     CellsByColor tracker = this.surveyNeighbors(this.computerCells);
     // get most frequent color
     ColorName colorName = tracker.getMostFrequentColor();
-    
+    System.out.println("Computer turn; picked '" + colorName + "'");
     // if a color is found, proceed
     if (colorName != null) {
       // get the set of cells for that color
@@ -144,6 +145,8 @@ public class Grid {
       }
       turnTaken = true;
     }
+    
+    System.out.println("Computer turn taken?: " + turnTaken);
     return turnTaken;
   }
   
@@ -157,14 +160,23 @@ public class Grid {
     boolean isGameOver = false;
     int totalCells = this.gridLength * this.gridHeight;
     
-    int notOwnedCells =
-        totalCells - this.playerCells.size() + this.computerCells.size();
+    System.out.println("\nIs game over? \n" +
+        "totalCells: " + totalCells + "\n" +
+        "playerCells: " + this.playerCells.size() + "\n" +
+        "computerCells: " + this.computerCells.size());
+    
+    int totalOwnedCells = this.playerCells.size() + this.computerCells.size();
+    System.out.println("totalOwnedCells: " + totalOwnedCells);
+    int notOwnedCells = totalCells - totalOwnedCells;
+    System.out.println("notOwnedCells: " + notOwnedCells);
     int userCellDifference =
         Math.abs(this.playerCells.size() - this.computerCells.size());
+    System.out.println("userCellDifference: " + userCellDifference);
     
-    if (notOwnedCells <= 0 && userCellDifference > notOwnedCells) {
+    if (notOwnedCells <= 0 || userCellDifference > notOwnedCells) {
       isGameOver = true;
     }
+    System.out.println("Decision: is game over?: " + isGameOver);
     
     return isGameOver;
   }
@@ -175,12 +187,14 @@ public class Grid {
    * @return user object or winner, or null if it is a tie.
    */
   public User getCurrentWinner () {
+    System.out.println("\nGet game winner");
     User winner = null;
     if (this.playerCells.size() > this.computerCells.size()) {
       winner = this.player;
     } else if (this.computerCells.size() > this.playerCells.size()) {
       winner = this.computer;
     }
+    System.out.println("The winner is: '" + winner + "'");
     return winner;
   }
   

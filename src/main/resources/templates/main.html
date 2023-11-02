@@ -11,7 +11,10 @@
   </head>
   <body>
     <h1>Color Flood Nostalgia Mid-90s</h1>
-
+    <br>
+    <div id="messageDiv">
+      <p th:text="${resultText}"></p>
+    </div>
     <table id="theGridTable" class=table>
       <tbody>
         <tr th:each="row: ${theGird}">
@@ -25,11 +28,12 @@
       </tbody>
     </table>
     <br/>
-    <table id="colorChoiceTable" class=table>
+    <table id="colorChoiceTable" class=table
+           th:hidden="${isGameOver}">
       <tbody>
         <tr>
           <span th:each="colorName: ${colorNames}">
-            <td th:id="${colorName.NAME}"
+            <td th:id="${colorName.NAME}" th:class="center"
               th:styleappend="${colorName.COLOR_STYLE + '; ' + colorRowWidthText}"/>
               <h3><a
                   th:style="'background-color: white'"
