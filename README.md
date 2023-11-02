@@ -140,3 +140,11 @@ VFX libraries. The way colors are selected could especially be improved, as
   implementations of Color Flood games are not against an opponent, a solo 
   play mode would be handy. In these circumstances the Player would try to 
   absorb the whole grid in as few turns as possible. 
+- __Functionality:__ There is an issue that the game does not detect when 
+  the Player or Computer can't take more turns, as there are no more cells 
+  to absorb. Currently, if this happens to the Computer, the player can 
+  continue as normal (the Computer will stop picking new colors), but when 
+  it happens to the player, and the Computer still has cells it could absorb, 
+  the Player needs to keep clicking on colors until the game ending 
+  conditions are met. This needs to be remedied with a method of determining 
+  whether the Player has more moves or not.
