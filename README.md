@@ -3,9 +3,9 @@
 <!-- TOC -->
 * [Description](#description)
   * [Gameplay](#gameplay)
-  * [Implementation](#implementation)
-    * [Development](#development)
-    * [Testing](#testing)
+* [Implementation](#implementation)
+  * [Development](#development)
+  * [Testing](#testing)
 * [Installation](#installation)
   * [Java 21](#java-21)
   * [Apache Maven 3.9.5](#apache-maven-395)
@@ -41,9 +41,9 @@ Player or Computer, or someone is winning by more cells than are left not
 controlled. Whoever controls more cells is the winner. At the bottom there 
 is a 'Reset Game' link, allowing the game to be played again. 
 
-### Implementation
+## Implementation
 
-#### Development
+### Development
 
 This game was made using the Java environment I have become used to while 
 working as a Full Stack Java Dev. It is a SpringBoot MVC application that uses 
@@ -64,7 +64,7 @@ Similarly, the Computer iterates over the cells it owns, counting up how
 many cells of each color are available to absorb, and then selects the color 
 with the most cells for its turn. 
 
-#### Testing
+### Testing
 
 Due to time constraints, most of the testing was conducted manually by 
 playing the game and using very simple console output log statements.
