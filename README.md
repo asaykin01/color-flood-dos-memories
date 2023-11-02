@@ -53,7 +53,7 @@ draw the grid and other components, simple tables and hyperlinks are used.
 
 The part that was most interesting to me while writing this were the 
 algorithms for determining which cells the Player absorbs during their turn, 
-as well ass how the computer determines which color to select. 
+as well ass how the Computer determines which color to select. 
 
 Once the Player clicks on a color, all  the cells they own are iterated 
 over to find neighboring cells of the chosen color. If such cells are found, 
@@ -142,9 +142,9 @@ VFX libraries. The way colors are selected could especially be improved, as
   absorb the whole grid in as few turns as possible. 
 - __Functionality:__ There is an issue that the game does not detect when 
   the Player or Computer can't take more turns, as there are no more cells 
-  to absorb. Currently, if this happens to the Computer, the player can 
+  to absorb. Currently, if this happens to the Computer, the Player can 
   continue as normal (the Computer will stop picking new colors), but when 
-  it happens to the player, and the Computer still has cells it could absorb, 
+  it happens to the Player, and the Computer still has cells it could absorb, 
   the Player needs to keep clicking on colors until the game ending 
   conditions are met. This needs to be remedied with a method of determining 
   whether the Player has more moves or not.
